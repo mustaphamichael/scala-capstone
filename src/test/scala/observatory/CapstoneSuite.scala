@@ -4,8 +4,9 @@ import org.junit.Assert._
 import org.scalacheck.Test
 
 class CapstoneSuite
-  extends ExtractionTest
-    with VisualizationTest
+//  extends ExtractionTest
+//    with VisualizationTest
+  extends VisualizationTest
     with InteractionTest
     with ManipulationTest
     with Visualization2Test
@@ -19,6 +20,8 @@ trait MilestoneSuite {
     } else {
       fail(s"Milestone $level ($milestoneName) is disabled. To enable it, set the 'Grading.milestone' value to '$level'.")
     }
+
+  def doubleCheck(value: Double, approx: Double): Boolean = math.abs(value - approx) < 0.001
 
 }
 
