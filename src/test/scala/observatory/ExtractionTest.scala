@@ -43,10 +43,10 @@ trait ExtractionTest extends MilestoneSuite {
       (LocalDate.of(2015, 12, 6), Location(37.358, -78.438), 0.0),
       (LocalDate.of(2015, 1, 29), Location(37.358, -78.438), 2.0)
     )
-    val expected = Seq(
+    val expected = Set(
       (Location(37.35, -78.433), 27.3),
       (Location(37.358, -78.438), 1.0)
     )
-    assertEquals(expected, locationYearlyAverageRecords(records).toList)
+    assertEquals(expected, locationYearlyAverageRecords(records).toSet)
   }
 }
