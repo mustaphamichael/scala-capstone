@@ -10,7 +10,7 @@ import scala.math.{abs, acos, cos, sin}
   */
 case class Location(lat: Double, lon: Double) {
   /**
-    * https://en.wikipedia.org/wiki/Antipodes#Mathematical_description
+    * See https://en.wikipedia.org/wiki/Antipodes#Mathematical_description
     *
     * @return True if two points are Antipodes
     */
@@ -19,7 +19,7 @@ case class Location(lat: Double, lon: Double) {
       (start.lon + end.lon == 180 || abs(start.lon - end.lon) == 180)
 
   /**
-    * https://en.wikipedia.org/wiki/Great-circle_distance
+    * See https://en.wikipedia.org/wiki/Great-circle_distance
     *
     * @param other Other location
     * @return The shortest distance between the two locations
@@ -72,5 +72,17 @@ case class CellPoint(x: Double, y: Double)
   * @param green Level of green, 0 ≤ green ≤ 255
   * @param blue  Level of blue, 0 ≤ blue ≤ 255
   */
-case class Color(red: Int, green: Int, blue: Int)
+case class Color(red: Int, green: Int, blue: Int) {
+  // Trim the color to match the threshold (0 ≤ int ≤ 255)
+  private def trim: Color = {
+    def threshold(color: Int): Int = if (color <= 0) 0 else math.min(color, 255)
 
+    Color(threshold(red), threshold(green), threshold(blue))
+  }
+
+  def +(other: Color): Color = Color((red + other.red) / 2, (green + other.green) / 2, (blue + other.blue) / 2).trim
+
+  def -(other: Color): Color = Color(abs(red - other.red), abs(green - other.green), abs(blue - other.blue)).trim
+
+  def *(multiplier: Double): Color = Color((red * multiplier).toInt, (green * multiplier).toInt, (blue * multiplier).toInt).trim
+}
