@@ -79,8 +79,28 @@ object Visualization extends VisualizationInterface {
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Temperature)], colors: Iterable[(Temperature, Color)]): Image = {
-    ???
-  }
+    val width = 360
+    val height = 180
+    val temperatureByLocation = temperatures.groupBy(_._1).mapValues(_.head._2) // Map[Location, Temperature]
+    val colorByTemperature = colors.groupBy(_._1).mapValues(_.head._2) // Map[Temperature, Color]
 
+    // map the latitude and longitude to the image pixel position
+    val longitudeOnXAxis = ((-180 until 180) zip (0 to width)).toMap
+    val latitudeOnYAxis = ((90 until -90 by -1) zip (0 to height)).toMap
+
+    // create pixel
+    val pixels: Array[Pixel] = Array(width * height)
+
+    for {
+      (loc, temp) <- temperatureByLocation
+      x = longitudeOnXAxis(loc.lon.toInt)
+      y = latitudeOnYAxis(loc.lat.toInt)
+      position = (width * x) + y
+      color = colorByTemperature(temp)
+    } pixels.update(position, Pixel(color.red, color.green, color.blue, 0))
+
+    // create image
+    Image(width, height, pixels)
+  }
 }
 
