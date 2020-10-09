@@ -42,30 +42,26 @@ trait VisualizationTest extends MilestoneSuite {
   @Test def `color arithmetic should be in the threshold`: Unit = {
     val c60 = Color(255, 255, 255)
     val c32 = Color(255, 0, 0)
-    assertEquals(Color(255, 127, 127), c60 + c32)
+    assertEquals(Color(255, 255, 255), c60 + c32)
     assertEquals(Color(0, 255, 255), c60 - c32)
     assertEquals(Color(255, 0, 0), c32 * 2)
   }
 
-  @Test def `linear interploation should estimate the right color`: Unit = {
+  @Test def `linear interpolation should estimate the right color`: Unit = {
     val x0 = 12.0
     val y0 = Color(255, 255, 0)
     val x1 = 32.0
     val y1 = Color(255, 0, 0)
-    assertEquals(Color(127, 178, 0), interpolateLinearly(x0, y0, x1, y1, 20))
+    assertEquals(Color(255, 153, 0), interpolateLinearly(x0, y0, x1, y1, 20))
   }
 
-  @Test def `interpolate color`: Unit = {
-    def rgbs: Iterable[(Temperature, Color)] = Seq(
-      (60, Color(255, 255, 255)), (32, Color(255, 0, 0)),
-      (12, Color(255, 255, 0)), (0, Color(0, 255, 255)),
-      (-15, Color(0, 0, 255)), (-27, Color(255, 0, 255)),
-      (-50, Color(33, 0, 107)), (-60, Color(0, 0, 0))
-    )
-
-    assertEquals(Color(255, 255, 255), interpolateColor(rgbs, 60)) // greater than or equal 60°C
-    assertEquals(Color(0, 0, 0), interpolateColor(rgbs, -90)) // less than or equal -60°C
-    assertEquals(Color(127, 178, 0), interpolateColor(rgbs, 20)) // within the color range
+  @Test def `interpolate color through a spectrum of available colors`: Unit = {
+    val rgbs = List((0.0, Color(255, 0, 0)), (1.0, Color(0, 0, 255)))
+    assertEquals(Color(255, 0, 0), interpolateColor(rgbs, -0.1)) // less than or equal to least
+    assertEquals(Color(0, 0, 255), interpolateColor(rgbs, 2.0)) // greater than or equal to most
+    assertEquals(Color(128, 0, 128), interpolateColor(rgbs, 0.5)) // within color range
+    assertEquals(Color(191, 0, 64),
+      interpolateColor(List((-89.0, Color(255, 0, 0)), (0.0, Color(0, 0, 255))), -66.75)) // within color range
   }
 
 }

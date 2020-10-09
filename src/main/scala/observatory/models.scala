@@ -1,6 +1,6 @@
 package observatory
 
-import scala.math.{abs, acos, cos, sin}
+import scala.math.{abs, acos, cos, round, sin}
 
 /**
   * Introduced in Week 1. Represents a location on the globe.
@@ -80,9 +80,9 @@ case class Color(red: Int, green: Int, blue: Int) {
     Color(threshold(red), threshold(green), threshold(blue))
   }
 
-  def +(other: Color): Color = Color((red + other.red) / 2, (green + other.green) / 2, (blue + other.blue) / 2).trim
+  def +(other: Color): Color = Color(red + other.red, green + other.green, blue + other.blue).trim
 
-  def -(other: Color): Color = Color(abs(red - other.red), abs(green - other.green), abs(blue - other.blue)).trim
+  def -(other: Color): Color = Color(red - other.red, green - other.green, blue - other.blue).trim
 
-  def *(multiplier: Double): Color = Color((red * multiplier).toInt, (green * multiplier).toInt, (blue * multiplier).toInt).trim
+  def *(multiplier: Double): Color = Color(round(red * multiplier).toInt, round(green * multiplier).toInt, round(blue * multiplier).toInt).trim
 }
