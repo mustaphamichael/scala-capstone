@@ -65,4 +65,22 @@ trait VisualizationTest extends MilestoneSuite {
       interpolateColor(List((-89.0, Color(255, 0, 0)), (0.0, Color(0, 0, 255))), -66.75)) // within color range
   }
 
+  /**
+    * Visualize Test Cases
+    */
+  @Test def `visualize test`: Unit = {
+    val temps = Seq(
+      (Location(37.35, -78.433), 27.3),
+      (Location(37.358, -78.438), 1.0)
+    )
+    val colors = Seq(
+      (60.0, Color(255, 255, 255)), (32.0, Color(255, 0, 0)),
+      (12.0, Color(255, 255, 0)), (0.0, Color(0, 255, 255)),
+      (-15.0, Color(0, 0, 255)), (-27.0, Color(255, 0, 255)),
+      (-50.0, Color(33, 0, 107)), (-60.0, Color(0, 0, 0))
+    )
+
+    visualize(temps, colors)
+  }
+
 }

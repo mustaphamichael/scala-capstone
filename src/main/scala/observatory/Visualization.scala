@@ -51,9 +51,7 @@ object Visualization extends VisualizationInterface {
     val x1 = getTemperature(temperatures(1)._2)
     val y1 = getColor(temperatures(1)._2)
 
-    if (value <= x0) y0
-    else if (value >= x1) y1
-    else interpolateLinearly(x0, y0, x1, y1, value)
+    interpolateLinearly(x0, y0, x1, y1, value)
   }
 
   /**
@@ -79,26 +77,24 @@ object Visualization extends VisualizationInterface {
   def visualize(temperatures: Iterable[(Location, Temperature)], colors: Iterable[(Temperature, Color)]): Image = {
     val width = 360
     val height = 180
-    val temperatureByLocation = temperatures.groupBy(_._1).mapValues(_.head._2) // Map[Location, Temperature]
-    val colorByTemperature = colors.groupBy(_._1).mapValues(_.head._2) // Map[Temperature, Color]
 
-    // map the latitude and longitude to the image pixel position
-    val longitudeOnXAxis = ((-180 until 180) zip (0 to width)).toMap
-    val latitudeOnYAxis = ((90 until -90 by -1) zip (0 to height)).toMap
+    // map the latitude and longitude to the image pixel position [(90, -180) => (0, 0)]
+    val longitudeOnXAxis = (-180 until 180) zip (0 until width)
+    val latitudeOnYAxis = (90 until -90 by -1) zip (0 until height)
 
     // create pixel
-    val pixels: Array[Pixel] = Array(width * height)
+    val pixels: Array[Pixel] = Array.fill(width * height)(0)
 
+    // update the pixels for the entire map
     for {
-      (loc, temp) <- temperatureByLocation
-      x = longitudeOnXAxis(loc.lon.toInt)
-      y = latitudeOnYAxis(loc.lat.toInt)
-      position = (width * x) + y
-      color = colorByTemperature(temp)
+      (lon, x) <- longitudeOnXAxis
+      (lat, y) <- latitudeOnYAxis
+      position = (width * y) + x
+      temp = predictTemperature(temperatures, Location(lat, lon))
+      color = interpolateColor(colors, temp)
     } pixels.update(position, Pixel(color.red, color.green, color.blue, 0))
 
     // create image
     Image(width, height, pixels)
   }
 }
-
