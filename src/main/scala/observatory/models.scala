@@ -1,6 +1,6 @@
 package observatory
 
-import scala.math.{abs, acos, cos, round, sin}
+import scala.math.{abs, acos, cos, round, sin, toRadians}
 
 /**
   * Introduced in Week 1. Represents a location on the globe.
@@ -14,9 +14,9 @@ case class Location(lat: Double, lon: Double) {
     *
     * @return True if two points are Antipodes
     */
-  private def areAntipodes(start: Location, end: Location): Boolean =
-    start.lat + end.lat == 0 &&
-      (start.lon + end.lon == 180 || abs(start.lon - end.lon) == 180)
+  private def areAntipodes(other: Location): Boolean =
+    this.lat + other.lat == 0 &&
+      (this.lon + other.lon == 180 || abs(this.lon - other.lon) == 180)
 
   /**
     * See https://en.wikipedia.org/wiki/Great-circle_distance
@@ -24,16 +24,16 @@ case class Location(lat: Double, lon: Double) {
     * @param other Other location
     * @return The shortest distance between the two locations
     */
-
-  // TODO: Multiply distance by radius
   def distanceTo(other: Location): Double = {
+    val radius = 6371.0 // the earth's radius
     val centralAngle = if (this == other) 0
-    else if (areAntipodes(this, other)) math.Pi
+    else if (areAntipodes(other)) math.Pi
     else {
-      val absLongitudeDiff = abs(this.lon - other.lon) // Absolute longitude difference
-      acos(sin(this.lat) * sin(other.lat) + cos(this.lat) * cos(other.lat) * cos(absLongitudeDiff))
+      val absLongitudeDiff = toRadians(abs(this.lon - other.lon)) // Absolute longitude difference
+      acos(sin(toRadians(this.lat)) * sin(toRadians(other.lat)) +
+        cos(toRadians(this.lat)) * cos(toRadians(other.lat)) * cos(absLongitudeDiff))
     }
-    centralAngle * 90
+    centralAngle * radius
   }
 }
 

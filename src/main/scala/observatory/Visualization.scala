@@ -13,21 +13,20 @@ object Visualization extends VisualizationInterface {
     * @return The predicted temperature at `location`
     */
   def predictTemperature(temperatures: Iterable[(Location, Temperature)], location: Location): Temperature = {
-    val power = 2
+    val power = 4.0
 
-    def weighingFunction(other: Location): Double = 1 / math.pow(location.distanceTo(other), power)
+    def weighingFunction(other: Location): Double = 1.0 / math.pow(location.distanceTo(other), power)
 
     // using spatial interpolation
-    val locations = temperatures.map(_._1)
-    if (locations.forall(loc => loc.distanceTo(location) != 0)) {
-      // use interpolating function
-      val n = temperatures.map { case (loc, temp) => weighingFunction(loc) * temp -> weighingFunction(loc) }
-      val (top, bottom) = n.fold((0.0, 0.0))((acc, elem) => (acc._1 + elem._1) -> (acc._2 + elem._2))
-      top / bottom
-    } else {
-      // return the temperature of already existing location
-      temperatures.find(_._1 == location).get._2
-    }
+    @scala.annotation.tailrec
+    def loop(list: List[(Location, Temperature)], sum: Double, weightSum: Double): Double =
+      list match {
+        case Nil => sum / weightSum
+        case (loc, temp) :: _ if loc.distanceTo(location) < 1 => temp // use the temperature for close locations (< 1km)
+        case (loc, temp) :: xs => loop(xs, sum + weighingFunction(loc) * temp, weightSum + weighingFunction(loc))
+      }
+
+    loop(temperatures.toList, 0.0, 0.0)
   }
 
   /**

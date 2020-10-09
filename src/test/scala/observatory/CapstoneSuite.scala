@@ -21,7 +21,7 @@ trait MilestoneSuite {
       fail(s"Milestone $level ($milestoneName) is disabled. To enable it, set the 'Grading.milestone' value to '$level'.")
     }
 
-  def doubleCheck(value: Double, approx: Double): Boolean = math.abs(value - approx) < 0.001
+  def doubleCheck(value: Double, approx: Double): Boolean = math.abs(value - approx) < 0.1
 
 }
 
