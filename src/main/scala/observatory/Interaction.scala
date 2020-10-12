@@ -29,13 +29,14 @@ object Interaction extends InteractionInterface {
     val zoom = 8 // (256 = 2⁸)
 
     // Parallel data structure used for faster processing
-    val pixels: Array[Pixel] = Array.fill(width * height)(0)
+    val pixels = new Array[Pixel](width * height)
 
     // Each pixel in a tile can be thought of as a sub-tile at a higher zoom level (256 = 2⁸).
     // See http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Subtiles for computing subtiles
 
-    val x0 = (pow(2, zoom) * tile.x).toInt
-    val y0 = (pow(2, zoom) * tile.y).toInt
+    val n = pow(2, zoom).toInt
+    val x0 = tile.x * n
+    val y0 = tile.y * n
     val z0 = tile.zoom + zoom
     for {
       x <- 0 until width
@@ -44,7 +45,7 @@ object Interaction extends InteractionInterface {
       subTile = Tile(x + x0, y + y0, z0)
       temp = predictTemperature(temperatures, tileLocation(subTile))
       color = interpolateColor(colors, temp)
-    } pixels.updated(position, Pixel(color.red, color.green, color.blue, 127))
+    } pixels.update(position, Pixel(color.red, color.green, color.blue, 127))
 
     Image(width, height, pixels)
   }
