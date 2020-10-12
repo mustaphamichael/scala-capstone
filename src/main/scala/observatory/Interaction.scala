@@ -5,8 +5,6 @@ import com.sksamuel.scrimage.{Image, Pixel}
 import math.pow
 import Visualization._
 
-import scala.collection.parallel.ParSeq
-
 /**
   * 3rd milestone: interactive visualization
   */
@@ -31,7 +29,7 @@ object Interaction extends InteractionInterface {
     val zoom = 8 // (256 = 2⁸)
 
     // Parallel data structure used for faster processing
-    val pixels: ParSeq[Pixel] = ParSeq.fill(width * height)(0)
+    val pixels: Array[Pixel] = Array.fill(width * height)(0)
 
     // Each pixel in a tile can be thought of as a sub-tile at a higher zoom level (256 = 2⁸).
     // See http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Subtiles for computing subtiles
@@ -40,15 +38,15 @@ object Interaction extends InteractionInterface {
     val y0 = (pow(2, zoom) * tile.y).toInt
     val z0 = tile.zoom + zoom
     for {
-      x <- (0 until width).par
-      y <- (0 until height).par
+      x <- 0 until width
+      y <- 0 until height
       position = (width * y) + x
       subTile = Tile(x + x0, y + y0, z0)
       temp = predictTemperature(temperatures, tileLocation(subTile))
       color = interpolateColor(colors, temp)
     } pixels.updated(position, Pixel(color.red, color.green, color.blue, 127))
 
-    Image(width, height, pixels.toArray)
+    Image(width, height, pixels)
   }
 
   /**
@@ -66,8 +64,8 @@ object Interaction extends InteractionInterface {
     for {
       (year, data) <- yearlyData
       zoom <- 0 to 3
-      x <- 0 to pow(2, zoom).toInt
-      y <- 0 to pow(2, zoom).toInt
+      x <- 0 until pow(2, zoom).toInt
+      y <- 0 until pow(2, zoom).toInt
     } generateImage(year, Tile(x, y, zoom), data)
   }
 }
