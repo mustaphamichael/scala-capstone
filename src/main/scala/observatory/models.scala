@@ -1,6 +1,6 @@
 package observatory
 
-import scala.math.{abs, acos, cos, round, sin, toRadians}
+import scala.math.{abs, acos, atan, cos, round, Pi, sin, sinh, toDegrees, toRadians}
 
 /**
   * Introduced in Week 1. Represents a location on the globe.
@@ -27,7 +27,7 @@ case class Location(lat: Double, lon: Double) {
   def distanceTo(other: Location): Double = {
     val radius = 6371.0 // the earth's radius
     val centralAngle = if (this == other) 0
-    else if (areAntipodes(other)) math.Pi
+    else if (areAntipodes(other)) Pi
     else {
       val absLongitudeDiff = toRadians(abs(this.lon - other.lon)) // Absolute longitude difference
       acos(sin(toRadians(this.lat)) * sin(toRadians(other.lat)) +
@@ -46,7 +46,15 @@ case class Location(lat: Double, lon: Double) {
   * @param y    Y coordinate of the tile
   * @param zoom Zoom level, 0 ≤ zoom ≤ 19
   */
-case class Tile(x: Int, y: Int, zoom: Int)
+case class Tile(x: Int, y: Int, zoom: Int) {
+  // convert to location
+  def toLocation: Location = {
+    val n = math.pow(2, zoom)
+    val lat = toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y.toDouble / n))))
+    val lon = (x.toDouble / n) * 360.0 - 180.0
+    Location(lat, lon)
+  }
+}
 
 /**
   * Introduced in Week 4. Represents a point on a grid composed of

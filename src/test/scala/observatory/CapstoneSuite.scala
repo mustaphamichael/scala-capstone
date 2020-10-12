@@ -6,8 +6,8 @@ import org.scalacheck.Test
 class CapstoneSuite
 //  extends ExtractionTest
 //    with VisualizationTest
-  extends VisualizationTest
-    with InteractionTest
+//    with InteractionTest
+  extends InteractionTest
     with ManipulationTest
     with Visualization2Test
     with Interaction2Test
