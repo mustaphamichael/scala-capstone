@@ -1,5 +1,8 @@
 package observatory
 
+import java.io.File
+
+import org.codehaus.janino.Java
 import org.junit.Assert._
 import org.junit.Test
 
@@ -57,12 +60,21 @@ trait VisualizationTest extends MilestoneSuite {
   }
 
   @Test def `interpolate color through a spectrum of available colors`: Unit = {
-    val rgbs = List((0.0, Color(255, 0, 0)), (1.0, Color(0, 0, 255)))
-    assertEquals(Color(255, 0, 0), interpolateColor(rgbs, -0.1)) // less than or equal to least
-    assertEquals(Color(0, 0, 255), interpolateColor(rgbs, 2.0)) // greater than or equal to most
-    assertEquals(Color(128, 0, 128), interpolateColor(rgbs, 0.5)) // within color range
-    assertEquals(Color(191, 0, 64),
-      interpolateColor(List((-89.0, Color(255, 0, 0)), (0.0, Color(0, 0, 255))), -66.75)) // within color range
+    val rgbs = List(
+      (100.0, Color(255, 255, 255)),
+      (50.0, Color(0, 0, 0)),
+      (0.0, Color(255, 0, 128))
+    )
+
+    //    println(interpolateColor(rgbs, 75.0))
+    assert(interpolateColor(rgbs, 50.0) == Color(0, 0, 0))
+    assert(interpolateColor(rgbs, 0.0) == Color(255, 0, 128))
+    assert(interpolateColor(rgbs, -10.0) == Color(255, 0, 128))
+    assert(interpolateColor(rgbs, 200.0) == Color(255, 255, 255))
+    assert(interpolateColor(rgbs, 75.0) == Color(128, 128, 128))
+    assert(interpolateColor(rgbs, 25.0) == Color(128, 0, 64))
+    assertEquals(Color(191, 0, 64), interpolateColor(List((-89.0, Color(255, 0, 0)), (0.0, Color(0, 0, 255))), -66.75)) // within color range
+    assert(interpolateColor(List((-9.385071236394225, Color(255, 0, 0)), (1.0, Color(0, 0, 255))), 1.0) == Color(0, 0, 255))
   }
 
   /**

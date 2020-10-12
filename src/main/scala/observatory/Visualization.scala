@@ -37,8 +37,9 @@ object Visualization extends VisualizationInterface {
   def interpolateColor(points: Iterable[(Temperature, Color)], value: Temperature): Color = {
     // sort the points by the proximity of the temperature values
     val temperatures = points.toVector
-      .map { p => p._1 - value -> p }
-      .sortBy(_._1)
+      .map { p => math.abs(p._1 - value) -> p }
+      .sortBy { case (d, tuple) => d }.take(2)
+      .sortBy { case (d, tuple) => tuple._1 }
 
     // Extract temperature
     def getTemperature(v: (Double, Color)): Temperature = v._1
@@ -51,7 +52,9 @@ object Visualization extends VisualizationInterface {
     val x1 = getTemperature(temperatures(1)._2)
     val y1 = getColor(temperatures(1)._2)
 
-    interpolateLinearly(x0, y0, x1, y1, value)
+    if (value <= x0) y0
+    else if (value >= x1) y1
+    else interpolateLinearly(x0, y0, x1, y1, value)
   }
 
   /**
