@@ -51,14 +51,21 @@ object Manipulation extends ManipulationInterface {
   def average(temperaturess: Iterable[Iterable[(Location, Temperature)]]): GridLocation => Temperature = {
     def computeAverage(temps: Iterable[Temperature]): Temperature = temps.sum / temps.size
 
-    val temps = temperaturess.flatten
-      .groupBy { case (location, _) => location }
-      .map { case (location, tuples) =>
-        val ts = tuples.map(_._2)
-        location -> computeAverage(ts)
-      }
+    // extract the temperature for each grid location
+    def gridTemperature(f: GridLocation => Temperature): Iterable[(GridLocation, Temperature)] = for {
+      lon <- -180 until 180
+      lat <- 90 until -90 by -1
+      loc = GridLocation(lat, lon)
+    } yield loc -> f(loc)
 
-    makeGrid(temps)
+    val average = temperaturess
+      .map(makeGrid) // make a grid for each year
+      .flatMap(gridTemperature)
+      .groupBy { case (location, _) => location } // group the temperatures by their grid location
+      .mapValues(_.map(_._2)) // extract the temperature of each location
+      .mapValues(computeAverage) // compute average per grid location
+
+    gridLocation: GridLocation => average(gridLocation)
   }
 
   /**
