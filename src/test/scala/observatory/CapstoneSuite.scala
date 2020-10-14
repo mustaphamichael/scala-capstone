@@ -7,8 +7,8 @@ class CapstoneSuite
 //  extends ExtractionTest
 //    with VisualizationTest
 //    with InteractionTest
-  extends InteractionTest
-    with ManipulationTest
+//    with ManipulationTest
+  extends ManipulationTest
     with Visualization2Test
     with Interaction2Test
 
