@@ -56,34 +56,37 @@ object Visualization2 extends Visualization2Interface {
     val z0 = tile.zoom + zoomLevel
     for {
       (x, y) <- axes
-      position = width * y + x
+      position = (width * y) + x
       subTile = Tile(x + x0, y + y0, z0)
       temp = predictTemperature(subTile, grid)
       color = Visualization.interpolateColor(colors, temp)
-    } pixels.update(position, Pixel(color.red, color.green, color.blue, 255))
+    } pixels.update(position, Pixel(color.red, color.green, color.blue, 127))
 
     Image(width, height, pixels)
   }
 
+  // Predict the temperature of the square tile
   private def predictTemperature(tile: Tile, f: GridLocation => Temperature): Temperature = {
     // convert tile to location
-    val location = tile.toLocation
-    val lon = location.lon
-    val lat = location.lat
+    val location = tile.toLocation // the tile's location on the map
+    val lon = location.lon.round.toInt // lower bound of longitude
+    val lat = location.lat.round.toInt // lower bound of latitude
 
-    // compute lower(*0) and upper(*1) bounds of lat and lon
-    val lonLow = lon.round.toInt
-    val lonUp = lon.ceil.toInt
-    val latLow = lat.round.toInt
-    val latUp = lat.ceil.toInt
+    // Since the interpolation is Unit Square, the difference between the lower and upper bound is 1
+    val lonUp = lon + 1
+    val latUp = lat + 1
 
     // use bilinear interpolation to predict temperature
-    val d00 = f(GridLocation(latLow, lonLow))
-    val d01 = f(GridLocation(latLow, lonUp))
-    val d10 = f(GridLocation(latUp, lonLow))
+    val d00 = f(GridLocation(lat, lon))
+    val d01 = f(GridLocation(latUp, lon))
+    val d10 = f(GridLocation(lat, lonUp))
     val d11 = f(GridLocation(latUp, lonUp))
 
-    bilinearInterpolation(CellPoint(tile.x, tile.y), d00, d01, d10, d11)
+    // x & y will always be positive
+    val x = location.lon - lon
+    val y = location.lat - lat
+
+    bilinearInterpolation(CellPoint(x, y), d00, d01, d10, d11)
   }
 
 }
