@@ -23,7 +23,7 @@ object Interaction2 extends Interaction2Interface {
       layerName = Deviations,
       colorScale = Seq((7, Color(0, 0, 0)), (4, Color(255, 0, 0)), (2, Color(255, 255, 0)),
         (0, Color(255, 255, 255)), (-2, Color(0, 255, 255)), (-7, Color(0, 0, 255))),
-      bounds = 1975 to 2015
+      bounds = 1990 to 2015
     )
 
     Seq(temperatures, deviations)
@@ -46,10 +46,10 @@ object Interaction2 extends Interaction2Interface {
     *         in the `selectedLayer` bounds.
     */
   def yearSelection(selectedLayer: Signal[Layer], sliderValue: Signal[Year]): Signal[Year] = {
-    val years = yearBounds(selectedLayer)()
-    if (sliderValue() < years.min) Var(years.min)
-    else if (sliderValue() > years.max) Var(years.max)
-    else sliderValue
+    Signal({
+      val year = selectedLayer().bounds
+      sliderValue().max(year.min).min(year.max)
+    })
   }
 
   /**
